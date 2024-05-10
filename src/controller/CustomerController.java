@@ -1,7 +1,6 @@
 package controller;
 
 import entity.Customer;
-import entity.Employee;
 import jdbc.DatabaseManager;
 
 import java.sql.*;

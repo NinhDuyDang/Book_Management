@@ -201,6 +201,7 @@ public class Main {
         System.out.println("3. Xóa sách");
         System.out.println("4. Hiển thị danh sách sách");
         System.out.println("5. Quay lại");
+        System.out.print("6. Tìm kiếm sách ");
         System.out.print("Chọn chức năng bạn muốn sử dụng (1-5): ");
         int choice = Integer.parseInt(sc.nextLine());
         switch (choice) {
@@ -274,6 +275,14 @@ public class Main {
             case 5:
                 startApplication();
                 break;
+
+            case 6:
+                System.out.print("Nhập tên sách cần tìm kếm : ");
+                String searchBookTitle = sc.nextLine().trim();
+                List<Book> titleBook =  bookController.searchBookByTitle(searchBookTitle);
+                for (Book b : titleBook) {
+                    System.out.println(b);
+                }
         }
     }
 

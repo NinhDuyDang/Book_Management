@@ -154,6 +154,10 @@ public List<Loan> getAllLoans() {
 
     return loans;
 }
+
+
+
+
     public List<Loan> searchLoanByBookTitle(String bookTitle) {
         List<Loan> result = new ArrayList<>();
 
@@ -239,8 +243,6 @@ public List<Loan> getAllLoans() {
         }
         return bookId;
     }
-
-
 
 
 }

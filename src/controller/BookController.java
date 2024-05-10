@@ -2,15 +2,17 @@ package controller;
 
 import entity.Book;
 import entity.Customer;
+import entity.Loan;
 import jdbc.DatabaseManager;
 
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookController {
     private Connection conn;
@@ -140,5 +142,70 @@ public class BookController {
             e.printStackTrace();
         }
         return books;
+    }
+
+
+
+
+    public List<Book> searchBookByTitle(String bookTitle) {
+        List<Book> result = new ArrayList<>();
+
+        int bookId = getBookIdByTitle(bookTitle);
+
+        if (bookId == -1) {
+            System.out.println("Không tìm thấy sách");
+            return result;
+        }
+
+        String bookQuery = "SELECT * FROM books WHERE book_Id = ?";
+
+        try (PreparedStatement bookStatement = conn.prepareStatement(bookQuery)) {
+            bookStatement.setInt(1, bookId);
+            try (ResultSet bookResultSet = bookStatement.executeQuery()) {
+                while (bookResultSet.next()) {
+                    int bookIdResult = bookResultSet.getInt("book_Id");
+                    String title = bookResultSet.getString("title");
+                    String category = bookResultSet.getString("category");
+                    String author = bookResultSet.getString("author");
+                    int quantity = bookResultSet.getInt("quantity");
+                    String publishedDate = bookResultSet.getString("publishedDate");
+                    Book book = new Book(bookIdResult, title, category, author, quantity, publishedDate);
+                    result.add(book);
+                }
+            }
+
+
+//            System.out.println("---------------------------------------------------------------------------------------------");
+//            System.out.printf("%5s %10s %10s %10 %10", "ID", "TITLE", "CATEGORY", "AUTHOR", "QUANTITY");
+//            System.out.println();
+//            System.out.println("---------------------------------------------------------------------------------------------");
+//            for (Book book : result) {
+//                System.out.format("%7s %14s %7s %14 %7 ",book.getBook_Id(), book.getTitle(), book.getCategory(), book.getAuthor(), book.getQuantity());
+//                System.out.println();
+//            }
+//            System.out.println("----------------------------------------------------------------------------------------------");
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi tìm kiếm sách");
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+    private int getBookIdByTitle(String bookTitle) {
+        int bookId = -1;
+        String sql = "SELECT book_Id FROM BOOKS WHERE title LIKE ?";
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, "%" + bookTitle + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    bookId = resultSet.getInt("book_Id");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi khi lấy ID của sách từ tên sách");
+            e.printStackTrace();
+        }
+        return bookId;
     }
 }
