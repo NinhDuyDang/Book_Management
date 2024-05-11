@@ -1,0 +1,28 @@
+<component name="libraryTable">
+  <library name="xmlbeans-2.3.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/xmlbeans-2.3.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/xml-apis-1.0.b2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/stax-api-1.0.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/servlet-api-2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-ooxml-schemas-3.6.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-ooxml-3.6.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-3.6.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/logkit-1.0.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/log4j-1.2.13.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/geronimo-stax-api_1.0_spec-1.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/dom4j-1.6.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/commons-logging-1.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/avalon-framework-4.1.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/java-web-project-main.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Downloads/java-web-project-main.zip!/java-web-project-main/backend/be-src/src/main/java" />
+      <root url="jar://$USER_HOME$/Downloads/java-web-project-main.zip!/java-web-project-main/backend/be-src/src/test/java" />
+      <root url="jar://$USER_HOME$/Downloads/ktltweb-master.zip!/ktltweb-master/backend/src/main/java" />
+      <root url="jar://$USER_HOME$/Downloads/web_nmcnpm-master.zip!/web_nmcnpm-master/src/main/java" />
+      <root url="jar://$USER_HOME$/Downloads/web_nmcnpm-master.zip!/web_nmcnpm-master/src/test/java" />
+    </SOURCES>
+  </library>
+</component>
