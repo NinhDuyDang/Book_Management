@@ -103,7 +103,7 @@ public class Main {
             case 4:
                 List<Customer> customers = customerController.getAllCustomers();
                 for (Customer c : customers) {
-                    System.out.println(c);
+//                    System.out.println(c);
                 }
                 customerManagement();
                 break;
@@ -182,7 +182,7 @@ public class Main {
             case 4:
                 List<Employee> employees = employeeController.getAllEmployees();
                 for (Employee e : employees) {
-                    System.out.println(e);
+//                    System.out.println(e);
                 }
                 employeeManagement();
                 break;
@@ -268,7 +268,7 @@ public class Main {
             case 4:
                 List<Book> books = bookController.getAllBooks();
                 for (Book b : books) {
-                    System.out.println(b);
+//                    System.out.println(b);
                 }
                 bookManagement();
                 break;
@@ -295,7 +295,8 @@ public class Main {
         System.out.println("4. Hiển thị danh sách phiếu mượn");
         System.out.println("5. Quay lại");
         System.out.print("6.Tìm kiếm\n");
-        System.out.print("Chọn chức năng bạn muốn sử dụng (1-5): ");
+        System.out.print("7. Xuất file excel\n");
+        System.out.print("Chọn chức năng bạn muốn sử dụng (1-6): ");
         int choice = Integer.parseInt(sc.nextLine());
         switch (choice) {
             case 1:
@@ -389,8 +390,14 @@ public class Main {
                 System.out.print("Nhập tên sách: ");
                 String searchBookTitle = sc.nextLine().trim();
                 List<Loan> titleLoans = loanController.searchLoanByBookTitle(searchBookTitle);
-                for (Loan l : titleLoans) {
-                }
+//                for (Loan l : titleLoans) {
+//                }
+                loanManagement();
+                break;
+            case 7 :
+                String filePath ="Loans.xlsx";
+                LoanController loanController = new LoanController();
+                loanController.exportLoansToExcel(filePath);
 
             default:
                 System.out.println(" Vui lòng chọn lại");

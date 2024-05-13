@@ -1,18 +1,24 @@
 package controller;
-
 import entity.Book;
 import entity.Customer;
 import entity.Loan;
 import jdbc.DatabaseManager;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class LoanController {
     private Connection conn;
 
@@ -66,6 +72,7 @@ public class LoanController {
             e.printStackTrace();
         }
     }
+
     public void deleteLoan(int loanId) {
         // Delete loan
         String sql = "DELETE FROM loans WHERE id = ?";
@@ -106,58 +113,100 @@ public class LoanController {
         return null;
     }
 
-public List<Loan> getAllLoans() {
-    List<Loan> loans = new ArrayList<>();
-    String sql = "SELECT * FROM loans";
+    public List<Loan> getAllLoans() {
+        List<Loan> loans = new ArrayList<>();
+        String sql = "SELECT * FROM loans";
 
-    try (PreparedStatement statement = conn.prepareStatement(sql);
-         ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
-        while (resultSet.next()) {
-            int loanId = resultSet.getInt("id");
-            int bookId = resultSet.getInt("book_Id");
-            int customerId = resultSet.getInt("customer_Id");
-            String borrowDate = resultSet.getString("borrowDate");
-            String dueDate = resultSet.getString("dueDate");
-            String status = resultSet.getString("status");
+            while (resultSet.next()) {
+                int loanId = resultSet.getInt("id");
+                int bookId = resultSet.getInt("book_Id");
+                int customerId = resultSet.getInt("customer_Id");
+                String borrowDate = resultSet.getString("borrowDate");
+                String dueDate = resultSet.getString("dueDate");
+                String status = resultSet.getString("status");
 
-            Loan newLoan = new Loan(loanId, bookId, customerId, borrowDate, dueDate, status);
-            loans.add(newLoan);
+                Loan newLoan = new Loan(loanId, bookId, customerId, borrowDate, dueDate, status);
+                loans.add(newLoan);
+            }
+
+
+            Map<Integer, Customer> loanCustomers = new HashMap<>(); // Cover list sang map
+            for (Loan loan : loans) {
+                Customer customer = new CustomerController().getCustomer(loan.getCustomer_Id());
+                loanCustomers.put(loan.getId(), customer);
+            }
+
+            Map<Integer, Book> loansMap = new HashMap<>();
+            for (Loan loan : loans) {
+                Book book = new BookController().getBook(loan.getBook_Id());
+                loansMap.put(loan.getId(), book);
+
+            }
+
+            // In thông tin về mượn sách
+            System.out.format("%5s %20s %20s %15s %15s %15s\n", "Loan ID", "Book Title", "Customer Name", "Borrow Date", "Due Date", "Status");
+            for (Loan loan : loans) {
+                Customer customer = loanCustomers.get(loan.getId());
+                Book book = loansMap.get(loan.getId());
+                System.out.format("%5s %20s %20s %15s %15s %15s\n", loan.getId(), book.getTitle(), customer.getName(), loan.getBorrowedDate(), loan.getDueDate(), loan.getStatus());
+
+            }
+
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving loan information");
+            e.printStackTrace();
         }
 
+        return loans;
 
-        Map<Integer, Customer> loanCustomers = new HashMap<>(); // Cover list sang map
-        for (Loan loan : loans) {
-            Customer customer = new CustomerController().getCustomer(loan.getCustomer_Id());
-            loanCustomers.put(loan.getId(), customer);
-        }
-
-        Map<Integer, Book> loansMap = new HashMap<>();
-        for (Loan loan : loans) {
-            Book book = new BookController().getBook(loan.getBook_Id());
-            loansMap.put(loan.getId(), book);
-
-        }
-
-        // In thông tin về mượn sách
-        System.out.format("%5s %20s %20s %15s %15s %15s\n", "Loan ID", "Book Title", "Customer Name", "Borrow Date", "Due Date", "Status");
-        for (Loan loan : loans) {
-            Customer customer = loanCustomers.get(loan.getId());
-            Book book = loansMap.get(loan.getId());
-            System.out.format("%5s %20s %20s %15s %15s %15s\n", loan.getId(), book.getTitle(), customer.getName() ,loan.getBorrowedDate(), loan.getDueDate(), loan.getStatus());
-        }
-
-    } catch (SQLException e) {
-        System.out.println("Error retrieving loan information");
-        e.printStackTrace();
     }
 
-    return loans;
-}
+    public void exportLoansToExcel(String filePath) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Loans");
+        Row row;
 
+        // Create headers for the Excel file
+        row = sheet.createRow(0);
+        row.createCell(0).setCellValue("Loan ID");
+        row.createCell(1).setCellValue("Customer Name");
+        row.createCell(2).setCellValue("Book Title");
+        row.createCell(3).setCellValue("Due Date");
+        row.createCell(4).setCellValue("Borrow Date");
 
+        List<Loan> loans = getAllLoans();
 
+        int rowNum = 1;
+        for (Loan loan : loans) {
+            row = sheet.createRow(rowNum++);
 
+            row.createCell(0).setCellValue(loan.getId());
+            Customer customer = new CustomerController().getCustomer(loan.getCustomer_Id());
+            if (customer != null) {
+                row.createCell(1).setCellValue(customer.getName());
+            } else {
+                row.createCell(1).setCellValue("Unknown Customer");
+            }
+            Book book = new BookController().getBook(loan.getBook_Id());
+            if (book != null) {
+                row.createCell(2).setCellValue(book.getTitle());
+            } else {
+                row.createCell(2).setCellValue("Unknown Book");
+            }
+            row.createCell(3).setCellValue(loan.getDueDate().toString());
+            row.createCell(4).setCellValue(loan.getBorrowedDate().toString());
+        }
+
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public List<Loan> searchLoanByBookTitle(String bookTitle) {
         List<Loan> result = new ArrayList<>();
 
@@ -168,11 +217,21 @@ public List<Loan> getAllLoans() {
             return result;
         }
 
-        String loanQuery = "SELECT * FROM loans WHERE book_Id = ?";
+        String loanQuery = "SELECT loans.id, loans.customer_id, loans.borrowDate, loans.dueDate, loans.status, books.title, customers.name " +
+                "FROM loans " +
+                "JOIN books ON loans.book_id = books.book_id " +
+                "JOIN customers ON loans.customer_id = customers.customer_id " +
+                "WHERE books.title LIKE ? OR customers.name LIKE ?";
+
         try (PreparedStatement loanStatement = conn.prepareStatement(loanQuery)) {
+            loanStatement.setString(1, "%" + bookTitle + "%");
+            loanStatement.setString(2, "%" + bookTitle + "%");
+
             loanStatement.setInt(1, bookId);
+
             try (ResultSet loanResultSet = loanStatement.executeQuery()) {
                 while (loanResultSet.next()) {
+
                     int loanId = loanResultSet.getInt("id");
                     int customerId = loanResultSet.getInt("customer_Id");
                     String borrowDate = loanResultSet.getString("borrowDate");
@@ -230,6 +289,7 @@ public List<Loan> getAllLoans() {
         int bookId = -1;
         String sql = "SELECT book_Id FROM BOOKS WHERE title LIKE ?";
 
+
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, "%" + bookTitle + "%");
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -243,6 +303,7 @@ public List<Loan> getAllLoans() {
         }
         return bookId;
     }
+
 
 
 }
