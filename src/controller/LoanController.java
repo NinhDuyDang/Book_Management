@@ -207,6 +207,8 @@ public class LoanController {
             e.printStackTrace();
         }
     }
+
+
     public List<Loan> searchLoanByBookTitle(String bookTitle) {
         List<Loan> result = new ArrayList<>();
 
@@ -227,7 +229,7 @@ public class LoanController {
             loanStatement.setString(1, "%" + bookTitle + "%");
             loanStatement.setString(2, "%" + bookTitle + "%");
 
-            loanStatement.setInt(1, bookId);
+//            loanStatement.setInt(1, bookId);
 
             try (ResultSet loanResultSet = loanStatement.executeQuery()) {
                 while (loanResultSet.next()) {
